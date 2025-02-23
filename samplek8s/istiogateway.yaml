@@ -1,0 +1,41 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: amllan-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - amllan.online
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: amllan-virtualservice
+spec:
+  hosts:
+  - amllan.online
+  gateways:
+  - amllan-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /oauth
+    route:
+    - destination:
+        host: oauth-service.default.svc.cluster.local
+        port:
+          number: 80
+  - match:
+    - uri:
+        prefix: /eureka
+    route:
+    - destination:
+        host: iot-eureka-service.default.svc.cluster.local
+        port:
+          number: 80
